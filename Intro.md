@@ -51,6 +51,7 @@ section {
 - More cache-efficient
 - Designed around composition over inheritance
 - More decoupled than OOP-designed architectures, easier to maintain as projects grow in size
+- Enables data-oriented design
 
 ---
 
@@ -135,3 +136,37 @@ section {
 - Structure of arrays:
   - A structure holds fields with arrays of data: `struct Players { positions: Vec<Pos>, healths: Vec<Health> }`
   - E.g. Moving positions now has good cache locality, since more positions will be in cache when using those values.
+
+---
+
+# Data-oriented design
+
+- A way to write programs bringing the handling and storage of data in focus, where performance and memory usage is key
+- CPU fast
+- RAM slow
+- Cache good, but limited in size
+- Make sure to access data in patterns that use spatially- and temporally closely located data and your program is faster
+- You only use what you need, so why drag everything else into the cache? ECS makes this explicit
+
+---
+
+# CPU architecture overview
+
+![bg fit 55%](./presentation-images/cpu-arch.gif)
+
+---
+
+# Latency numbers
+
+<!-- _footer: Peter Norvig, 2009, http://norvig.com/21-days.html#answers -->
+
+![bg fit 55%](./presentation-images/cpu-latencies.png)
+
+---
+
+# ECS summarized
+
+- A game is full of entities
+- Entities have zero or more components of each kind
+- Components don't talk together, they only have data
+- Systems can read and mutate components, add or remove them, or spawn and despawn entities and their components
