@@ -317,9 +317,11 @@ struct Position(Vec2); // Component marking a 2D position using a 2D-vector
 
 <style scoped>
 section {
-    font-size: 1.75rem;
+    font-size: 1.5rem;
 }
 </style>
+
+`Commands` allows spawning and despawning entities, accessing their components, and more. Each command is pushed to a queue which is executed at a later "flush-point" after the system is finished.
 
 ```rust
 fn main() {
@@ -487,3 +489,32 @@ mod greet_plugin {
     }
 }
 ```
+
+---
+
+# Displaying images
+
+```rust
+fn main() {
+    App::new()
+        .add_plugins(DefaultPlugins)
+        .add_systems(Startup, (spawn_camera, spawn_player))
+        .run();
+}
+
+fn spawn_camera(mut commands: Commands) {
+  commands.spawn(Camera2d);
+}
+
+fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands
+        .spawn_empty()
+        .insert(Sprite::from_image(asset_server.load("santa.png")));
+}
+```
+
+---
+
+# Result
+
+![bg fit 75%](./presentation-images/santa-in-bevy.png)
