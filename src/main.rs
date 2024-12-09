@@ -9,6 +9,15 @@ enum DebugMode {
     Off,
 }
 
+impl DebugMode {
+    fn toggle(&self) -> Self {
+        match self {
+            DebugMode::On => DebugMode::Off,
+            DebugMode::Off => DebugMode::On,
+        }
+    }
+}
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
@@ -35,9 +44,6 @@ fn toggle_debug_mode(
     mut next_state: ResMut<NextState<DebugMode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyD) {
-        next_state.set(match debug_mode.get() {
-            DebugMode::On => DebugMode::Off,
-            DebugMode::Off => DebugMode::On,
-        });
+        next_state.set(debug_mode.get().toggle());
     }
 }
