@@ -22,6 +22,7 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .init_state::<DebugMode>()
+        .init_resource::<CursorPosition>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
         .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
         .add_systems(
@@ -34,11 +35,15 @@ fn main() {
                 move_present,
             ),
         )
+        .add_systems(Update, update_cursor_position)
         .run();
 }
 
+#[derive(Component)]
+struct MainCamera;
+
 fn spawn_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
+    commands.spawn((Camera2d, MainCamera));
 }
 
 #[derive(Component)]
@@ -104,13 +109,19 @@ fn move_elf(
 #[derive(Component)]
 struct Present;
 
+#[derive(Component)]
+struct Speed(Vec2);
+
 fn throw_present(
     query: Query<&Transform, With<Elf>>,
     asset_server: Res<AssetServer>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
+    cursor_position: Res<CursorPosition>,
     mut commands: Commands,
 ) {
     let elf_transform = query.single();
+
+    let throw_direction = (cursor_position.0 - elf_transform.translation.truncate()).normalize();
 
     if keyboard_input.just_pressed(KeyCode::Space) {
         commands
@@ -120,13 +131,41 @@ fn throw_present(
                 scale: elf_transform.scale / 10.0,
                 ..*elf_transform
             })
+            .insert(Speed(throw_direction * 10.0))
             .insert(Sprite::from_image(asset_server.load("present.png")));
     }
 }
 
-fn move_present(mut query: Query<&mut Transform, With<Present>>) {
-    for mut present_transform in query.iter_mut() {
-        present_transform.translation += Vec3::new(10.0, 0.0, 0.0);
+fn move_present(mut query: Query<(&mut Transform, &Speed), With<Present>>) {
+    for (mut present_transform, speed) in query.iter_mut() {
+        present_transform.translation += Vec3::new(speed.0.x, speed.0.y, 0.0);
+    }
+}
+
+/// The last known cursor position
+///
+/// Is not updated when the cursor is moved outside the main window
+#[derive(Resource, Default)]
+pub struct CursorPosition(Vec2);
+
+fn update_cursor_position(
+    mut cursor_position: ResMut<CursorPosition>,
+    window_query: Query<&Window>,
+    camera_query: Query<(&Camera, &GlobalTransform), With<MainCamera>>,
+) {
+    if window_query.is_empty() || camera_query.is_empty() {
+        return;
+    }
+
+    let (camera, camera_transform) = camera_query.single();
+    let window = window_query.single();
+    if let Some(position) = window
+        .cursor_position()
+        .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor).ok())
+        .map(|ray| ray.origin.truncate())
+    {
+        trace!("Cursor moved: {}", position);
+        cursor_position.0 = position;
     }
 }
 
