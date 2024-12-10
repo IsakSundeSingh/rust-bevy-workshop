@@ -24,7 +24,16 @@ fn main() {
         .init_state::<DebugMode>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
         .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
-        .add_systems(FixedUpdate, (toggle_debug_mode, move_santa, move_elf))
+        .add_systems(
+            FixedUpdate,
+            (
+                toggle_debug_mode,
+                move_santa,
+                move_elf,
+                throw_present,
+                move_present,
+            ),
+        )
         .run();
 }
 
@@ -90,6 +99,35 @@ fn move_elf(
 
     let z = elf_transform.translation.z;
     elf_transform.translation += Vec3::new(delta.x, delta.y, z) * 10.0;
+}
+
+#[derive(Component)]
+struct Present;
+
+fn throw_present(
+    query: Query<&Transform, With<Elf>>,
+    asset_server: Res<AssetServer>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    mut commands: Commands,
+) {
+    let elf_transform = query.single();
+
+    if keyboard_input.just_pressed(KeyCode::Space) {
+        commands
+            .spawn_empty()
+            .insert(Present)
+            .insert(Transform {
+                scale: elf_transform.scale / 10.0,
+                ..*elf_transform
+            })
+            .insert(Sprite::from_image(asset_server.load("present.png")));
+    }
+}
+
+fn move_present(mut query: Query<&mut Transform, With<Present>>) {
+    for mut present_transform in query.iter_mut() {
+        present_transform.translation += Vec3::new(10.0, 0.0, 0.0);
+    }
 }
 
 fn toggle_debug_mode(
