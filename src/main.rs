@@ -23,7 +23,7 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_state::<DebugMode>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
-        .add_systems(Startup, (spawn_camera, spawn_santa))
+        .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
         .add_systems(FixedUpdate, (toggle_debug_mode, move_santa))
         .run();
 }
@@ -41,6 +41,17 @@ fn spawn_santa(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(Santa)
         .insert(Transform::from_xyz(0.0, 0.0, 0.0))
         .insert(Sprite::from_image(asset_server.load("santa.png")));
+}
+
+#[derive(Component)]
+struct Elf;
+
+fn spawn_elf(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands
+        .spawn_empty()
+        .insert(Elf)
+        .insert(Transform::from_xyz(100.0, 100.0, 0.0))
+        .insert(Sprite::from_image(asset_server.load("elf.png")));
 }
 
 fn move_santa(mut query: Query<&mut Transform, With<Santa>>, time: Res<Time>) {
