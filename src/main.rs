@@ -43,9 +43,12 @@ fn spawn_santa(mut commands: Commands, asset_server: Res<AssetServer>) {
         .insert(Sprite::from_image(asset_server.load("santa.png")));
 }
 
-fn move_santa(mut query: Query<&mut Transform, With<Santa>>) {
+fn move_santa(mut query: Query<&mut Transform, With<Santa>>, time: Res<Time>) {
     let mut santa_transform = query.single_mut();
-    santa_transform.translation += Vec3::new(1.0, 0.0, 0.0);
+
+    let circle = FunctionCurve::new(Interval::EVERYWHERE, |t| Vec3::new(t.sin(), t.cos(), 0.0));
+
+    santa_transform.translation = circle.sample(time.elapsed_secs_wrapped()).unwrap() * 250.0;
 }
 
 fn toggle_debug_mode(
