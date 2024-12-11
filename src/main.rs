@@ -1,10 +1,12 @@
 use bevy::{
     dev_tools::fps_overlay::FpsOverlayConfig,
-    math::bounding::{Aabb2d, IntersectsVolume},
+    math::bounding::{Aabb2d, BoundingVolume, IntersectsVolume},
     prelude::*,
 };
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+
+const PRESENT_SCALE: Vec3 = Vec3::new(0.1, 0.1, 0.1);
 
 #[derive(Debug, Default, Clone, Hash, States, PartialEq, Eq)]
 enum DebugMode {
@@ -141,7 +143,7 @@ fn throw_present(
             .spawn_empty()
             .insert(Present)
             .insert(Transform {
-                scale: elf_transform.scale / 10.0,
+                scale: PRESENT_SCALE,
                 ..*elf_transform
             })
             .insert(Speed(throw_direction * 10.0))
@@ -189,6 +191,7 @@ fn handle_santa_present_collisions(
     asset_server: Res<AssetServer>,
     mut score: ResMut<Score>,
     mut commands: Commands,
+    mut gizmos: Gizmos,
 ) {
     if santa.is_empty() || presents.is_empty() {
         return;
@@ -208,12 +211,23 @@ fn handle_santa_present_collisions(
         let handle = asset_server.load("present.png");
         let image = assets.get(&handle).unwrap();
         let size = image.size();
-        size.as_vec2() / 2.0
+        size.as_vec2() / 2.0 * PRESENT_SCALE.truncate()
     };
 
+    gizmos.rect_2d(
+        Isometry2d::from_translation(santa_bounding_box.center()),
+        santa_bounding_box.half_size() * 2.0,
+        Color::srgb(1.0, 0.0, 0.0),
+    );
     for (present_transform, entity) in presents.iter() {
         let present_bounding_box =
             Aabb2d::new(present_transform.translation.truncate(), present_half_size);
+
+        gizmos.rect_2d(
+            Isometry2d::from_translation(present_bounding_box.center()),
+            present_bounding_box.half_size() * 2.0,
+            Color::srgb(0.0, 1.0, 0.0),
+        );
 
         if present_bounding_box.intersects(&santa_bounding_box) {
             // Santa caught a present!
