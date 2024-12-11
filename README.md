@@ -37,6 +37,7 @@ Each assignment will get one feature working. Features might be improved upon in
 
 <details>
 <summary>Solution ✅ (Open me)</summary>
+
 If you're stuck, check out these blocks for a _suggested_ solution. You might finish the assignment some other way, but future assignments will assume you solved an assignment in the way the suggested solution does.
 
 **Remember** It's sort of expected that you at least take a look at these. Or just do things as explained in the suggested solution.Otherwise you might get a surprisingly difficult coming assignment if it does something differently from how you did it.
@@ -76,6 +77,7 @@ Your pre-code includes code for spawning an image of a santa claus, but the sant
 
 <details>
 <summary>Solution ✅</summary>
+
 To make santa move, you need to write a system that queries for Santa's `Transform`, mutably, so `&mut Transform` and then move Santa accordingly.
 
 Add a marker component to the Santa so we can query for just him:
@@ -141,6 +143,7 @@ Great! Santa's moving around, but walking in a straight direction off-screen and
 
 <details>
 <summary>Solution ✅</summary>
+
 Okay, so this might be a bit more difficult than the first assignment...
 
 To move Santa in a circle, let's start by creating a curve that represents a circle. A unit circle can be written in its parametric form as:
@@ -194,6 +197,7 @@ Santa's looking kind of lonesome, let's add an Elf to our game.
 
 <details>
 <summary>Solution ✅</summary>
+
 This should be simpler again!
 
 Essentially copy the code of the Santa and just place the elf somewhere else on screen:
@@ -491,10 +495,10 @@ And now change the code for `move_present` to use the new `Speed`-component:
 
 <details>
 <summary>Solution for mouse click to throw✅</summary>
+
 If you want mouse clicks to also throw presents, just listen to mouse click events:
 
 ```diff
-
 fn throw_present(
     query: Query<&Transform, With<Elf>>,
     asset_server: Res<AssetServer>,
@@ -537,6 +541,7 @@ At least on my machine, this kind of lags? Every mouse-click should in theory sp
 
 <details>
 <summary>Solution ✅</summary>
+
 Let's be a bit lazy. Not everything has to be done by hand.
 
 Let's just use Bevy's built-in developer tools!
@@ -623,6 +628,7 @@ For now, what is this? This is barely a game, we have a Santa that's more confus
 
 <details>
 <summary>Solution ✅ (Getting image sizes)</summary>
+
 To retrieve an image's size, we can do the following:
 
 ```rust
@@ -719,6 +725,7 @@ Great! Register the system to run on `FixedUpdate` and check if it works:
 
 <details>
 <summary>Solution ✅ (Score counting and removing presents)</summary>
+
 This should be a bit easier to keep up with.
 
 First off, we want to keep a _global_ score of how many presents the Santa's caught. We know that globally unique values are stored as _resources_! Add a new resource called `Score` with a number inside, and register it:
@@ -798,6 +805,7 @@ Sometimes presents are caught waay outside what I would consider Santa's boundin
 
 <details>
 <summary>Solution ✅ (Adding gizmos)</summary>
+
 Alright, adding Gizmos is not as difficult as the example I linked to makes it seem like. To our collision-handler, simply add this as a parameter:
 
 ```diff
@@ -853,6 +861,7 @@ Drawing gizmos for bounding boxes shows us that our presents have a huuge boundi
 
 <details>
 <summary>Solution ✅ (Fixing the bug)</summary>
+
 Since our image is properly cropped, and we do the same image-size extracting logic for our present images as our Santa image, why is the present's bounding box incorrect?
 
 Well, as we've seen before, `Transform`s contain both a position, rotation and a _scale_! Aha! I remember, if you've followed the suggested solution code you will have this bug (in `throw_present`):
