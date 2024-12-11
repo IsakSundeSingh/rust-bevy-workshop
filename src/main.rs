@@ -5,6 +5,7 @@ use bevy::{
 };
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use noisy_bevy::simplex_noise_2d;
 
 const PRESENT_SCALE: Vec3 = Vec3::new(0.1, 0.1, 0.1);
 
@@ -89,7 +90,10 @@ fn spawn_elf(mut commands: Commands, asset_server: Res<AssetServer>) {
 fn move_santa(mut query: Query<&mut Transform, With<Santa>>, time: Res<Time>) {
     let mut santa_transform = query.single_mut();
 
-    let circle = FunctionCurve::new(Interval::EVERYWHERE, |t| Vec3::new(t.sin(), t.cos(), 0.0));
+    let circle = FunctionCurve::new(Interval::EVERYWHERE, |t| {
+        let point = Vec3::new(t.sin(), t.cos(), 0.0);
+        point * simplex_noise_2d(point.truncate()) / 1.4
+    });
 
     santa_transform.translation = circle.sample(time.elapsed_secs_wrapped()).unwrap() * 250.0;
 }
