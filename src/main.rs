@@ -116,6 +116,7 @@ fn throw_present(
     query: Query<&Transform, With<Elf>>,
     asset_server: Res<AssetServer>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
+    mouse_input: Res<ButtonInput<MouseButton>>,
     cursor_position: Res<CursorPosition>,
     mut commands: Commands,
 ) {
@@ -123,7 +124,7 @@ fn throw_present(
 
     let throw_direction = (cursor_position.0 - elf_transform.translation.truncate()).normalize();
 
-    if keyboard_input.just_pressed(KeyCode::Space) {
+    if keyboard_input.just_pressed(KeyCode::Space) || mouse_input.just_pressed(MouseButton::Left) {
         commands
             .spawn_empty()
             .insert(Present)
