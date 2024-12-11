@@ -37,7 +37,10 @@ fn main() {
         .init_resource::<CursorPosition>()
         .init_resource::<Score>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
-        .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
+        .add_systems(
+            Startup,
+            (spawn_camera, spawn_santa, spawn_elf, spawn_score_text),
+        )
         .add_systems(
             FixedUpdate,
             (
@@ -47,6 +50,7 @@ fn main() {
                 throw_present,
                 move_present,
                 handle_santa_present_collisions,
+                draw_score,
             ),
         )
         .add_systems(Update, update_cursor_position)
@@ -246,6 +250,18 @@ fn handle_santa_present_collisions(
             println!("Santa caught a present! Score: {}", score.0);
         }
     }
+}
+
+#[derive(Debug, Component)]
+struct ScoreText;
+
+fn spawn_score_text(score: Res<Score>, mut commands: Commands) {
+    commands.spawn((Text(format!("Score: {}", score.0)), ScoreText));
+}
+
+fn draw_score(score: Res<Score>, mut query: Query<&mut Text, With<ScoreText>>) {
+    let mut score_text = query.single_mut();
+    score_text.0 = format!("Score: {}", score.0)
 }
 
 fn toggle_debug_mode(
