@@ -518,3 +518,19 @@ fn spawn_player(mut commands: Commands, asset_server: Res<AssetServer>) {
 # Result
 
 ![bg fit 75%](./presentation-images/santa-in-bevy.png)
+
+---
+
+# Transform
+
+```rust
+pub struct Transform {
+    pub translation: Vec3,
+    pub rotation: Quat,
+    pub scale: Vec3,
+}
+```
+
+- [Transforms](https://docs.rs/bevy/latest/bevy/prelude/struct.Transform.html) are the backbone of positioning.
+- Everything with a `Sprite` and `Transform` is drawn on screen at some `transform.translation` (position), with some `transform.rotation` and at some `transform.scale`
+- Even in 2D, `Vec3` is used for positioning, where the z-component is the draw order of images, with higher z-values being drawn last
