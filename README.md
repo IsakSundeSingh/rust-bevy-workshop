@@ -1066,6 +1066,10 @@ Now we have a game that kind of works, but a game is never finished. There are t
 
 ## Conclusion
 
+An example of something we'll have ended up with:
+
+![](./workshop-images/game-example.gif)
+
 I hope you learned something from this workshop! And most of all, I hope you had at least _some_ fun.
 
 Making a game is difficult, there's everything from technical performance to art and story design to worry about if you want to, and everything in between. This workshop isn't meant to be a guide on how to make a proper game, that is something covered by thousands of others.
