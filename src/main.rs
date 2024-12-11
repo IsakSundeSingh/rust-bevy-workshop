@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{dev_tools::fps_overlay::FpsOverlayConfig, prelude::*};
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -19,9 +19,12 @@ impl DebugMode {
 }
 
 fn main() {
+    let mut fps_overlay_plugin = bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default();
+    fps_overlay_plugin.config.enabled = false;
     App::new()
         .add_plugins(DefaultPlugins)
         .init_state::<DebugMode>()
+        .add_plugins(fps_overlay_plugin)
         .init_resource::<CursorPosition>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
         .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
@@ -173,9 +176,12 @@ fn update_cursor_position(
 fn toggle_debug_mode(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     debug_mode: Res<State<DebugMode>>,
+    mut fps_overlay_config: ResMut<FpsOverlayConfig>,
     mut next_state: ResMut<NextState<DebugMode>>,
 ) {
     if keyboard_input.just_pressed(KeyCode::KeyD) && keyboard_input.pressed(KeyCode::ControlLeft) {
-        next_state.set(debug_mode.get().toggle());
+        let debugging = debug_mode.get().toggle();
+        fps_overlay_config.enabled = matches!(debugging, DebugMode::On);
+        next_state.set(debugging);
     }
 }
