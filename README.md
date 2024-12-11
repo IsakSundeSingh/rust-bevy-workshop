@@ -22,6 +22,8 @@ Head to [src/main.rs](./src/main.rs) to get started.
 
 ## Workshop structure
 
+This guide is intended to be read on [GitHub](https://github.com/IsakSundeSingh/rust-bevy-workshop?tab=readme-ov-file#workshop-structure). That way, you get a rendered page, and all the formatting is as I intended when I wrote it.
+
 This workshop is intended to be a guide for getting started with some game development with Rust and Bevy. I advise you to try to get through the assignments, as they will show you enough of the "rough parts" to get a working game going.
 
 However, you are free and _encouraged_ to add new features on top of this workshop if you want to.
