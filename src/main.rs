@@ -1,4 +1,8 @@
-use bevy::{dev_tools::fps_overlay::FpsOverlayConfig, prelude::*};
+use bevy::{
+    dev_tools::fps_overlay::FpsOverlayConfig,
+    math::bounding::{Aabb2d, IntersectsVolume},
+    prelude::*,
+};
 
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -18,6 +22,9 @@ impl DebugMode {
     }
 }
 
+#[derive(Resource, Debug, Default)]
+struct Score(u32);
+
 fn main() {
     let mut fps_overlay_plugin = bevy::dev_tools::fps_overlay::FpsOverlayPlugin::default();
     fps_overlay_plugin.config.enabled = false;
@@ -26,6 +33,7 @@ fn main() {
         .init_state::<DebugMode>()
         .add_plugins(fps_overlay_plugin)
         .init_resource::<CursorPosition>()
+        .init_resource::<Score>()
         .add_plugins(WorldInspectorPlugin::new().run_if(in_state(DebugMode::On)))
         .add_systems(Startup, (spawn_camera, spawn_santa, spawn_elf))
         .add_systems(
@@ -36,6 +44,7 @@ fn main() {
                 move_elf,
                 throw_present,
                 move_present,
+                handle_santa_present_collisions,
             ),
         )
         .add_systems(Update, update_cursor_position)
@@ -170,6 +179,52 @@ fn update_cursor_position(
     {
         trace!("Cursor moved: {}", position);
         cursor_position.0 = position;
+    }
+}
+
+fn handle_santa_present_collisions(
+    santa: Query<&Transform, With<Santa>>,
+    presents: Query<(&Transform, Entity), With<Present>>,
+    assets: Res<Assets<Image>>,
+    asset_server: Res<AssetServer>,
+    mut score: ResMut<Score>,
+    mut commands: Commands,
+) {
+    if santa.is_empty() || presents.is_empty() {
+        return;
+    }
+
+    let santa_transform = santa.single();
+    let santa_bounding_box = {
+        let handle = asset_server.load("santa.png");
+        let image = assets.get(&handle).unwrap();
+
+        let size = image.size();
+        let half_size = size.as_vec2() / 2.0;
+        Aabb2d::new(santa_transform.translation.truncate(), half_size)
+    };
+
+    let present_half_size = {
+        let handle = asset_server.load("present.png");
+        let image = assets.get(&handle).unwrap();
+        let size = image.size();
+        size.as_vec2() / 2.0
+    };
+
+    for (present_transform, entity) in presents.iter() {
+        let present_bounding_box =
+            Aabb2d::new(present_transform.translation.truncate(), present_half_size);
+
+        if present_bounding_box.intersects(&santa_bounding_box) {
+            // Santa caught a present!
+
+            // Try to get the present and despawn it
+            if let Some(mut entity) = commands.get_entity(entity) {
+                entity.despawn();
+            }
+            score.0 += 1;
+            println!("Santa caught a present! Score: {}", score.0);
+        }
     }
 }
 
