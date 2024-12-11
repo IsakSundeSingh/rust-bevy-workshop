@@ -191,6 +191,7 @@ fn handle_santa_present_collisions(
     asset_server: Res<AssetServer>,
     mut score: ResMut<Score>,
     mut commands: Commands,
+    debug_mode: Res<State<DebugMode>>,
     mut gizmos: Gizmos,
 ) {
     if santa.is_empty() || presents.is_empty() {
@@ -214,20 +215,25 @@ fn handle_santa_present_collisions(
         size.as_vec2() / 2.0 * PRESENT_SCALE.truncate()
     };
 
-    gizmos.rect_2d(
-        Isometry2d::from_translation(santa_bounding_box.center()),
-        santa_bounding_box.half_size() * 2.0,
-        Color::srgb(1.0, 0.0, 0.0),
-    );
+    if let DebugMode::On = debug_mode.get() {
+        gizmos.rect_2d(
+            Isometry2d::from_translation(santa_bounding_box.center()),
+            santa_bounding_box.half_size() * 2.0,
+            Color::srgb(1.0, 0.0, 0.0),
+        );
+    }
+
     for (present_transform, entity) in presents.iter() {
         let present_bounding_box =
             Aabb2d::new(present_transform.translation.truncate(), present_half_size);
 
-        gizmos.rect_2d(
-            Isometry2d::from_translation(present_bounding_box.center()),
-            present_bounding_box.half_size() * 2.0,
-            Color::srgb(0.0, 1.0, 0.0),
-        );
+        if let DebugMode::On = debug_mode.get() {
+            gizmos.rect_2d(
+                Isometry2d::from_translation(present_bounding_box.center()),
+                present_bounding_box.half_size() * 2.0,
+                Color::srgb(0.0, 1.0, 0.0),
+            );
+        }
 
         if present_bounding_box.intersects(&santa_bounding_box) {
             // Santa caught a present!
