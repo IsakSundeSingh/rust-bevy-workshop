@@ -17,30 +17,6 @@ transition: melt
 
 ---
 
-<!-- paginate: true -->
-
-# Agenda
-
-<style scoped>
-section {
-    font-size: 1.9rem;
-}
-</style>
-
-- 12:35: Intro til ECS (25 min)
-- 13:00: Intro til Bevy (30 min)
-- 13:30 - 13:40: Pause (10 min)
-- Snacks underveis
-- 13:40: Gruppearbeid (10 min)
-- 13:50: Oppgaver workshop (40 min)
-- 14:30-14:40: Pause (10 min)
-- 14:40: Videre workshopping (25 min)
-- 15:05: Sync med ny gruppearbeid/fremvisning? (15 min)
-- 15:20 - 16:00: Videre jobbing (40 min)
-- 16:00-16:30: oppsummering og presentasjoner
-
----
-
 <!-- _footer: ECS presentation content inspired/borrowed from Peder Voldnes Langdal  -->
 
 # ECS
